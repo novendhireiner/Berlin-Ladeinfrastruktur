@@ -63,7 +63,7 @@ if page == "Ladestation Visualisierung":
         ).add_to(map_berlin)
     
     # Karte anzeigen
-    st_folium(map_berlin, width=2400, height=1000)
+    st_folium(map_berlin, width=2000, height=1000)
 
 # ---- Seite 2: Verkehrsanalyse mit OSM ----
 if page == "Verkehrsanalyse (OSM)":
@@ -115,7 +115,7 @@ if page == "Verkehrsanalyse (OSM)":
             popup=f"In Nähe zu Verkehrsknoten: {row['Straße']}"
         ).add_to(map_osm)
 
-    st_folium(map_osm, width=2400, height=1000)
+    st_folium(map_osm, width=2000, height=1000)
 
     # Zusammenfassung der Ergebnisse
     st.subheader("Ergebnisse der Analyse")
