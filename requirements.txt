@@ -6,4 +6,4 @@ streamlit_folium
 folium
 pandas
 pyomo
-osmx
+osmnx
