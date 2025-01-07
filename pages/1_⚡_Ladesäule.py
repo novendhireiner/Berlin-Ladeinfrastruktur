@@ -6,6 +6,7 @@ import osmnx as ox
 from shapely.geometry import Point
 import geopandas as gpd
 
+# ---- Streamlit Konfiguration ----
 st.set_page_config(layout="wide")
 
 
@@ -13,11 +14,10 @@ st.set_page_config(layout="wide")
 st.sidebar.title("Navigation")
 page = st.sidebar.radio("Seite auswählen", ["Ladestation Visualisierung", "Verkehrsanalyse (OSM)"])
 
-# Customize the sidebar
+# Seitenleiste – Projektinfo
 markdown = """
 Ein Projekt über Ladeinfrastruktur für Elektrofahrzeuge in Berlin
 """
-
 st.sidebar.title("About")
 st.sidebar.info(markdown)
 logo = "data/ladestation.png"
@@ -29,15 +29,18 @@ st.sidebar.image(logo)
 def load_data():
     file_path = 'data/Ladesaeulenregister_Berlin_01122024.csv'
     df = pd.read_csv(file_path, sep=';', encoding='utf-8')
+    
+    # Koordinaten korrigieren (Komma zu Punkt)
     df['Breitengrad'] = df['Breitengrad'].str.replace(',', '.').astype(float)
     df['Längengrad'] = df['Längengrad'].str.replace(',', '.').astype(float)
 
-    # Überprüfe auf fehlende Werte und filtere diese heraus
+    # Nur vollständige Zeilen behalten
     valid_df = df.dropna(subset=['Breitengrad', 'Längengrad'])
 
-    return df
+    return valid_df
 
 valid_df = load_data()
+
 
 # ---- Seite 1: Visualisierung der Ladestationen ----
 if page == "Ladestation Visualisierung":
@@ -60,6 +63,7 @@ if page == "Ladestation Visualisierung":
     
     # Karte anzeigen
     st_folium(map_berlin, width=1800, height=1000)
+
 
 # ---- Seite 2: Verkehrsanalyse mit OSM ----
 if page == "Verkehrsanalyse (OSM)":
@@ -96,11 +100,15 @@ if page == "Verkehrsanalyse (OSM)":
     
     # Pufferzone von 500m um Knotenpunkte erstellen
     buffer = nodes.buffer(0.005)  # 0.005° ≈ 500m
+
+    # GeoDataFrame für Ladestationen erstellen
     valid_df['geometry'] = valid_df.apply(lambda x: Point(x['Längengrad'], x['Breitengrad']), axis=1)
     gdf_ladesaeulen = gpd.GeoDataFrame(valid_df, geometry='geometry', crs="EPSG:4326")
+
+    # Ladesäulen in der Nähe von Verkehrsknotenpunkten
     nearby_ladesaeulen = gdf_ladesaeulen[gdf_ladesaeulen.intersects(buffer.unary_union)]
 
-    # Markiere Ladesäulen in der Nähe von Verkehrsknotenpunkten (rot)
+    # Markiere nahegelegene Ladesäulen (rot)
     for _, row in nearby_ladesaeulen.iterrows():
         folium.CircleMarker(
             location=[row['Breitengrad'], row['Längengrad']],
@@ -111,6 +119,7 @@ if page == "Verkehrsanalyse (OSM)":
             popup=f"In Nähe zu Verkehrsknoten: {row['Straße']}"
         ).add_to(map_osm)
 
+    # Karte anzeigen
     st_folium(map_osm, width=1800, height=1000)
 
     # Zusammenfassung der Ergebnisse
