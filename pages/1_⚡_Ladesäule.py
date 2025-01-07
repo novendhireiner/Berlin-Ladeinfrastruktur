@@ -1,12 +1,17 @@
 import streamlit as st
 import pandas as pd
 import folium
-from streamlit_folium import folium_static
+from streamlit_folium import st_folium
 import osmnx as ox
 from shapely.geometry import Point
 import geopandas as gpd
 
 st.set_page_config(layout="wide")
+
+
+# ---- Streamlit Navigation ----
+st.sidebar.title("Navigation")
+page = st.sidebar.radio("Seite auswählen", ["Ladestation Visualisierung", "Verkehrsanalyse (OSM)"])
 
 # Customize the sidebar
 markdown = """
@@ -30,18 +35,23 @@ def load_data():
 
 ladesaeulen_df = load_data()
 
-# ---- Streamlit Navigation ----
-st.sidebar.title("Navigation")
-page = st.sidebar.radio("Seite auswählen", ["Ladestation Visualisierung", "Verkehrsanalyse (OSM)"])
-
 # ---- Seite 1: Visualisierung der Ladestationen ----
 if page == "Ladestation Visualisierung":
     st.title("Ladeinfrastruktur in Berlin")
     
+    # Überprüfe auf fehlende Werte und filtere diese heraus
+    valid_df = ladesaeulen_df.dropna(subset=['Breitengrad', 'Längengrad'])
+    
+    # Anzahl der entfernten Stationen anzeigen (falls vorhanden)
+    fehlende_koord = len(ladesaeulen_df) - len(valid_df)
+    if fehlende_koord > 0:
+        st.warning(f"{fehlende_koord} Ladestationen wurden entfernt, da sie keine gültigen Koordinaten enthalten.")
+
+    # Karte erstellen
     map_berlin = folium.Map(location=[52.5200, 13.4050], zoom_start=11)
 
     # Ladestationen auf der Karte anzeigen (blau)
-    for _, row in ladesaeulen_df.iterrows():
+    for _, row in valid_df.iterrows():
         folium.Marker(
             location=[row['Breitengrad'], row['Längengrad']],
             popup=(
@@ -52,7 +62,8 @@ if page == "Ladestation Visualisierung":
             icon=folium.Icon(color="blue", icon="bolt", prefix="fa")
         ).add_to(map_berlin)
     
-    folium_static(map_berlin)
+    # Karte anzeigen
+    st_folium(map_berlin)
 
 # ---- Seite 2: Verkehrsanalyse mit OSM ----
 if page == "Verkehrsanalyse (OSM)":
@@ -104,7 +115,7 @@ if page == "Verkehrsanalyse (OSM)":
             popup=f"In Nähe zu Verkehrsknoten: {row['Straße']}"
         ).add_to(map_osm)
 
-    folium_static(map_osm)
+    st_folium(map_osm)
 
     # Zusammenfassung der Ergebnisse
     st.subheader("Ergebnisse der Analyse")
