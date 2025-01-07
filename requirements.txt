@@ -1,5 +1,9 @@
 --find-links=https://girder.github.io/large_image_wheels GDAL
 geopandas
-leafmap
-owslib
+shapely
 streamlit
+streamlit_folium
+folium
+pandas
+pyomo
+osmx
