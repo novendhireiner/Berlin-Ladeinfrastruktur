@@ -31,22 +31,18 @@ def load_data():
     df = pd.read_csv(file_path, sep=';', encoding='utf-8')
     df['Breitengrad'] = df['Breitengrad'].str.replace(',', '.').astype(float)
     df['Längengrad'] = df['Längengrad'].str.replace(',', '.').astype(float)
+
+    # Überprüfe auf fehlende Werte und filtere diese heraus
+    valid_df = df.dropna(subset=['Breitengrad', 'Längengrad'])
+
     return df
 
-ladesaeulen_df = load_data()
+valid_df = load_data()
 
 # ---- Seite 1: Visualisierung der Ladestationen ----
 if page == "Ladestation Visualisierung":
     st.title("Ladeinfrastruktur in Berlin")
     
-    # Überprüfe auf fehlende Werte und filtere diese heraus
-    valid_df = ladesaeulen_df.dropna(subset=['Breitengrad', 'Längengrad'])
-    
-    # Anzahl der entfernten Stationen anzeigen (falls vorhanden)
-    #fehlende_koord = len(ladesaeulen_df) - len(valid_df)
-    #if fehlende_koord > 0:
-    #    st.warning(f"{fehlende_koord} Ladestationen wurden entfernt, da sie keine gültigen Koordinaten enthalten.")
-
     # Karte erstellen
     map_berlin = folium.Map(location=[52.5200, 13.4050], zoom_start=11)
 
@@ -63,7 +59,7 @@ if page == "Ladestation Visualisierung":
         ).add_to(map_berlin)
     
     # Karte anzeigen
-    st_folium(map_berlin, width=2000, height=1000)
+    st_folium(map_berlin, width=1800, height=1000)
 
 # ---- Seite 2: Verkehrsanalyse mit OSM ----
 if page == "Verkehrsanalyse (OSM)":
@@ -91,7 +87,7 @@ if page == "Verkehrsanalyse (OSM)":
         ).add_to(map_osm)
     
     # Ladesäulen auf der Karte anzeigen (blau)
-    for _, row in ladesaeulen_df.iterrows():
+    for _, row in valid_df.iterrows():
         folium.Marker(
             location=[row['Breitengrad'], row['Längengrad']],
             popup=(f"Ladestation: {row['Betreiber']}"),
@@ -100,8 +96,8 @@ if page == "Verkehrsanalyse (OSM)":
     
     # Pufferzone von 500m um Knotenpunkte erstellen
     buffer = nodes.buffer(0.005)  # 0.005° ≈ 500m
-    ladesaeulen_df['geometry'] = ladesaeulen_df.apply(lambda x: Point(x['Längengrad'], x['Breitengrad']), axis=1)
-    gdf_ladesaeulen = gpd.GeoDataFrame(ladesaeulen_df, geometry='geometry', crs="EPSG:4326")
+    valid_df['geometry'] = valid_df.apply(lambda x: Point(x['Längengrad'], x['Breitengrad']), axis=1)
+    gdf_ladesaeulen = gpd.GeoDataFrame(valid_df, geometry='geometry', crs="EPSG:4326")
     nearby_ladesaeulen = gdf_ladesaeulen[gdf_ladesaeulen.intersects(buffer.unary_union)]
 
     # Markiere Ladesäulen in der Nähe von Verkehrsknotenpunkten (rot)
@@ -115,7 +111,7 @@ if page == "Verkehrsanalyse (OSM)":
             popup=f"In Nähe zu Verkehrsknoten: {row['Straße']}"
         ).add_to(map_osm)
 
-    st_folium(map_osm, width=2000, height=1000)
+    st_folium(map_osm, width=1800, height=1000)
 
     # Zusammenfassung der Ergebnisse
     st.subheader("Ergebnisse der Analyse")
