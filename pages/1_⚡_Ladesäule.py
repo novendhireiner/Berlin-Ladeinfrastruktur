@@ -43,9 +43,9 @@ if page == "Ladestation Visualisierung":
     valid_df = ladesaeulen_df.dropna(subset=['Breitengrad', 'Längengrad'])
     
     # Anzahl der entfernten Stationen anzeigen (falls vorhanden)
-    fehlende_koord = len(ladesaeulen_df) - len(valid_df)
-    if fehlende_koord > 0:
-        st.warning(f"{fehlende_koord} Ladestationen wurden entfernt, da sie keine gültigen Koordinaten enthalten.")
+    #fehlende_koord = len(ladesaeulen_df) - len(valid_df)
+    #if fehlende_koord > 0:
+    #    st.warning(f"{fehlende_koord} Ladestationen wurden entfernt, da sie keine gültigen Koordinaten enthalten.")
 
     # Karte erstellen
     map_berlin = folium.Map(location=[52.5200, 13.4050], zoom_start=11)
@@ -63,7 +63,7 @@ if page == "Ladestation Visualisierung":
         ).add_to(map_berlin)
     
     # Karte anzeigen
-    st_folium(map_berlin)
+    st_folium(map_berlin, width=1200, height=800)
 
 # ---- Seite 2: Verkehrsanalyse mit OSM ----
 if page == "Verkehrsanalyse (OSM)":
@@ -115,7 +115,7 @@ if page == "Verkehrsanalyse (OSM)":
             popup=f"In Nähe zu Verkehrsknoten: {row['Straße']}"
         ).add_to(map_osm)
 
-    st_folium(map_osm)
+    st_folium(map_osm, width=1200, height=800)
 
     # Zusammenfassung der Ergebnisse
     st.subheader("Ergebnisse der Analyse")
