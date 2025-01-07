@@ -1,40 +1,104 @@
 import streamlit as st
-import leafmap.foliumap as leafmap
 
 st.set_page_config(layout="wide")
 
 # Customize the sidebar
 markdown = """
-A Streamlit map template
-<https://github.com/opengeos/streamlit-map-template>
+Ein Projekt über Ladeinfrastruktur für Elektrofahrzeuge in Berlin
 """
 
 st.sidebar.title("About")
 st.sidebar.info(markdown)
-logo = "https://i.imgur.com/UbOXYAU.png"
+logo = "data/ladestation.png"
 st.sidebar.image(logo)
 
 # Customize page title
-st.title("Streamlit for Geospatial Applications")
+st.title("Projekt - Ladeinfrastruktur für Elektrofahrzeuge in Berlin")
 
 st.markdown(
     """
-    This multipage app template demonstrates various interactive web apps created using [streamlit](https://streamlit.io) and [leafmap](https://leafmap.org). It is an open-source project and you are very welcome to contribute to the [GitHub repository](https://github.com/opengeos/streamlit-map-template).
+    Dieses Projekt zielt darauf ab, die Ladeinfrastruktur für Elektrofahrzeuge in Berlin zu analysieren und zu optimieren. Mithilfe von Geodaten, Verkehrsdaten und Optimierungsmodellen wird untersucht, wo neue Ladestationen platziert werden sollten, um eine maximale Abdeckung und Benutzerfreundlichkeit zu gewährleisten.
+
+    Die interaktive Streamlit-Webanwendung visualisiert bestehende Ladestationen, analysiert die Nähe zu Verkehrsknotenpunkten und bietet Filtermöglichkeiten nach Betreiber, Ladeleistung und Bezirken. Optimierte Standorte für zukünftige Ladestationen werden auf der Karte hervorgehoben.
     """
 )
 
-st.header("Instructions")
+st.header("Ziel des Projekts")
 
 markdown = """
-1. For the [GitHub repository](https://github.com/opengeos/streamlit-map-template) or [use it as a template](https://github.com/opengeos/streamlit-map-template/generate) for your own project.
-2. Customize the sidebar by changing the sidebar text and logo in each Python files.
-3. Find your favorite emoji from https://emojipedia.org.
-4. Add a new app to the `pages/` directory with an emoji in the file name, e.g., `1_🚀_Chart.py`.
-
+1. Optimierung der Standortauswahl für neue Ladestationen in Berlin.
+2. Analyse bestehender Ladeinfrastruktur basierend auf aktuellen Daten.
+3. Verkehrsflussanalyse mit OpenStreetMap (OSM)-Daten zur Identifizierung von Standorten mit hoher Fahrzeugdichte.
+4. Interaktive Visualisierung von Ladestationen und Verkehrsknotenpunkten.
+5. Erweiterte Filtermöglichkeiten zur Fokussierung auf bestimmte Betreiber, Ladeleistung oder Bezirke.
 """
 
 st.markdown(markdown)
 
-m = leafmap.Map(minimap_control=True)
-m.add_basemap("OpenTopoMap")
-m.to_streamlit(height=500)
+st.header("Hauptfunktionen der App")
+st.markdown(
+    """
+    1. Visualisierung bestehender Ladestationen
+        - Zeigt alle Ladestationen in Berlin auf einer interaktiven Karte.
+        - Bestehende Ladestationen werden in blau dargestellt.
+    2. Optimierungsmodell mit Pyomo
+        - Optimiert die Standortauswahl für neue Ladestationen basierend auf:
+            > Minimierung der Kosten für neue Installationen
+            > Maximierung der Abdeckung von Verkehrsbereichen
+        - Optimierte Standorte werden in rot angezeigt
+    3. Verkehrsanalyse mit OpenStreeMap (OSM)
+        - Lädt das Straßennetzwerk von Berlin und visualisiert es.
+        - Bestehende Ladestationen entlang von Hauptverkehrsstraßen werden analysiert.
+        - Ladestationen in der Nähe von Verkehrsknotenpunkten (innerhalb von 500 m) werden hervorgehoben.
+    4. Filtermöglichkeiten
+        - Betreiber: Filter nach bestimmten Ladestationsbetreibern.
+        - Ladeleistung: Filter für minimale und maximale Ladeleistung.
+        - Bezirk: Filter nach Berliner Bezirken.
+        - Verkehrsanalyse: Zeigt Ladestationen entlang von Hauptstraßen und in der Nähe von Kreuzungen.
+    """
+)
+
+st.header("Technologien und Tools")
+st.markdown(
+    """
+    - Programmiersprachen: Python
+    - Framework: Streamlit
+    - Datenanalyse: Pandas, Geopandas
+    - Optimierung: Pyomo
+    - Geodaten: Folium, OSMnx (OpenStreetMap)
+    - Kartenvisualisierung: Folium
+    """
+)
+
+st.header("Datenquellen")
+st.markdown(
+    """
+    1. Ladesäulenregister Berlin
+        - CSV-Datei aus https://www.ladeinfrastruktur.berlin
+    2. OpenStreetMap (OSM)
+        - Straßennetzwerk von Berlin für die Verkehrsanalyse.
+    3. Berliner Bezirksdaten:
+        - CSV-Datei aus https://github.com/funkeinteraktiv/Berlin-Geodaten
+    """
+)
+
+st.header("Beispielszenarien")
+st.markdown(
+    """
+    Fall 1:
+        - Zeige alle Ladestationen in Kreuzberg mit einer Ladeleistung von mindestens 50 kW.
+    Fall 2:
+        - Finde heraus, welche Ladestationen sich in der Nähe von Verkehrsknotenpunkten befinden, um den Bedarf für neue Stationen zu ermitteln.
+    Fall 3:
+        - Optimiere Standorte für 200 neue Ladestationen und visualisiere diese.
+    """
+)
+
+st.header("Zukünftige Erweiterungen")
+st.markdown(
+    """
+    - Heatmap-Analyse der Ladeinfrastruktur.
+    - Simulation verschiedener Szenarien für schnelles oder langsames Wachstum der Elektromobilität.
+    - Erweiterung auf andere Städte.
+    """
+)
