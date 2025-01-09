@@ -56,8 +56,8 @@ gdf_ladesaeulen = gpd.GeoDataFrame(valid_df, geometry='geometry', crs="EPSG:4326
 st.title("Analyse der Ladeinfrastruktur in Berlin")
 st.markdown(
     """
-    Diese Seite bietet eine Analyse der Ladeinfrastruktur für Elektrofahrzeuge in Berlin.
-    Sie können bestehende Ladestationen und berechnete Stationen in der Nähe von Verkehrsknotenpunkten visualisieren.
+    Diese App bietet eine Analyse der Ladeinfrastruktur für Elektrofahrzeuge in Berlin.
+    Sie können bestehende Ladestationen und berechnete Stationen in der Nähe von Verkehrsknotenpunkten visualisieren mit Pufferzone auf 500m.
     """
 )
 
@@ -73,6 +73,12 @@ if selected_bezirk != "Alle":
     gdf_ladesaeulen = gdf_ladesaeulen[gdf_ladesaeulen.within(bezirk_polygon)]
     nodes = nodes[nodes.within(bezirk_polygon)]
     edges = edges[edges.within(bezirk_polygon)]
+
+# ---- Ladeleistungsfilter hinzufügen ----
+filter_by_power = st.checkbox("Nur Ladestationen mit mindestens 50 kW anzeigen", value=False)
+
+if filter_by_power:
+    gdf_ladesaeulen = gdf_ladesaeulen[gdf_ladesaeulen['Nennleistung Ladeeinrichtung [kW]'] >= 50]
 
 # ---- Pufferzone um Verkehrsknotenpunkte erstellen ----
 buffer = nodes.buffer(0.005)  # 0.005° ≈ 500m
