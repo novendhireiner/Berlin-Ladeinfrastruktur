@@ -3,12 +3,14 @@ import pandas as pd
 import folium
 from streamlit_folium import folium_static
 from pyomo.environ import *
+import pyomo.environ as pe
 import geopandas as gpd
-from glpk import glpk, GLPK
+
+
 
 st.set_page_config(layout="wide")
 
-# Customize the sidebar
+# ---- Streamlit Sidebar ----
 markdown = """
 Ein Projekt über Ladeinfrastruktur für Elektrofahrzeuge in Berlin
 """
@@ -39,7 +41,7 @@ ladesaeulen_df = load_data()
 bezirke_df = load_bezirke()
 
 # ---- Optimierungsmodell (Pyomo) ----
-model = ConcreteModel()
+model = pe.ConcreteModel()
 model.x = Var(ladesaeulen_df.index, within=Binary)
 model.obj = Objective(
     expr=sum(model.x[i] * ladesaeulen_df.loc[i, 'Kosten'] for i in ladesaeulen_df.index),
@@ -48,8 +50,8 @@ model.obj = Objective(
 model.min_stations = Constraint(expr=sum(model.x[i] for i in ladesaeulen_df.index) >= 200)
 model.coverage = Constraint(expr=sum(model.x[i] * ladesaeulen_df.loc[i, 'Abdeckung'] for i in ladesaeulen_df.index) >= 150)
 
-solver = SolverFactory('glpk')
-solver.solve(model)
+solver = pe.SolverFactory("appsi_highs")
+result = solver.solve(model, tee=True)
 
 selected_stations = [i for i in ladesaeulen_df.index if model.x[i]() == 1]
 
