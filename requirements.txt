@@ -7,3 +7,4 @@ folium
 pandas
 pyomo
 osmnx
+cbc
