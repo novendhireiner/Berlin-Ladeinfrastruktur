@@ -4,7 +4,7 @@ import folium
 from streamlit_folium import folium_static
 from pyomo.environ import *
 import geopandas as gpd
-import glpk
+from glpk import glpk, GLPK
 
 st.set_page_config(layout="wide")
 
