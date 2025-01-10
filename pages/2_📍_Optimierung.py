@@ -124,17 +124,18 @@ for _, row in filtered_df.iterrows():
 
 # Optimierte Standorte (rot)
 for i in selected_stations:
-    row = ladesaeulen_df.iloc[i]
-    folium.Marker(
-        location=[row['Breitengrad'], row['Längengrad']],
-        popup=(
-            f"Optimierter Standort<br>"
-            f"Betreiber: {row['Betreiber']}<br>"
-            f"Leistung: {row['Nennleistung Ladeeinrichtung [kW]']} kW<br>"
-            f"Adresse: {row['Straße']} {row['Hausnummer']}"
-        ),
-        icon=folium.Icon(color="red", icon="plus", prefix="fa")
-    ).add_to(map_berlin)
+    if i < len(ladesaeulen_df):  # Überprüfe, ob der Index gültig ist
+        row = ladesaeulen_df.iloc[i]
+        folium.Marker(
+            location=[row['Breitengrad'], row['Längengrad']],
+            popup=(
+                f"Optimierter Standort<br>"
+                f"Betreiber: {row['Betreiber']}<br>"
+                f"Leistung: {row['Nennleistung Ladeeinrichtung [kW]']} kW<br>"
+                f"Adresse: {row['Straße']} {row['Hausnummer']}"
+            ),
+            icon=folium.Icon(color="red", icon="plus", prefix="fa")
+        ).add_to(map_berlin)
 
 # ---- Karte in der App anzeigen ----
 folium_static(map_berlin)
