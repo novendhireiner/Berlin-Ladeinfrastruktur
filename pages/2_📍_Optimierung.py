@@ -29,6 +29,22 @@ def load_data():
     df['Längengrad'] = df['Längengrad'].str.replace(',', '.').astype(float)
     df['Kosten'] = 10000  # Fiktive Kosten
     df['Abdeckung'] = 1   # Abdeckung pro Ladestation
+
+    # Überprüfe, ob die Spalte existiert
+    if 'Nennleistung Ladeeinrichtung [kW]' not in df.columns:
+        st.error("Die Spalte 'Nennleistung Ladeeinrichtung [kW]' ist nicht in der Datei enthalten.")
+        st.stop()
+
+    # Konvertiere die Spalte in numerische Werte
+    df['Nennleistung Ladeeinrichtung [kW]'] = pd.to_numeric(
+        df['Nennleistung Ladeeinrichtung [kW]'], errors='coerce'
+    )
+
+    # Fehlende Werte behandeln
+    if df['Nennleistung Ladeeinrichtung [kW]'].isna().any():
+        st.warning("Es gibt fehlende Werte in 'Nennleistung Ladeeinrichtung [kW]'. Diese werden entfernt.")
+        df = df.dropna(subset=['Nennleistung Ladeeinrichtung [kW]'])
+
     return df
 
 @st.cache_data
