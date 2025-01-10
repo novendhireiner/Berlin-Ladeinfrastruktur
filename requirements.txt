@@ -7,4 +7,4 @@ folium
 pandas
 pyomo
 osmnx
-coincbc
+glpk
