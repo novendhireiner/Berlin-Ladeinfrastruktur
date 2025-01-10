@@ -87,7 +87,7 @@ leistung_min, leistung_max = st.sidebar.slider(
 )
 
 # Bezirksfilter
-bezirk_options = ['Alle'] + list(bezirke_df['Gemeinde_name'].unique())
+bezirk_options = ['Alle'] + list(bezirke_df['name'].unique())
 selected_bezirk = st.sidebar.selectbox("Bezirk auswählen:", bezirk_options)
 
 # ---- Filter Logik ----
